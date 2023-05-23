@@ -1,34 +1,17 @@
-
 //request module
 const request = require('request');
 
-//get command-line arguments
-const args = process.argv;
-const breedName = args.splice(2);
-
-//connection function to get from URL and call the callback function
-const connection = (functionToRunFetchData) => {
+// fetch API data according to breed name
+const fetchBreedDescription = function (breedName, callback) {
   request(`https://api.thecatapi.com/v1/breeds/search?q=${breedName}`, (error, response, body) => {
-    if (!error) {
-      //callback function
-      functionToRunFetchData(body);
-    } else {
-      console.log("ERROR: URL is not valid");
-    }
+    //convert data into JSON object format
+    const data = JSON.parse(body);
+    //get description from data
+    const description = data[0].description;
+    //call function
+    callback(error, description);
   });
-}
+};
 
-//callback function implementation
-const fetchData = (body) => {
-  const data = JSON.parse(body);
-
-  //if requested breed not found
-  if (data.length == 0) {
-    console.log("Message: Requested breed is not found");
-    return;
-  }
-  console.log(data[0].description);
-}
-
-//call connection function
-connection(fetchData);
+//export module
+module.exports = { fetchBreedDescription };
